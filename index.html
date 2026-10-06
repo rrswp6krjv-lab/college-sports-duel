@@ -504,7 +504,7 @@ const supabaseClient = window.supabase.createClient(
         .subscribe();
 }
 
-    function subscribeToRoom(roomId) {
+   function subscribeToRoom(roomId) {
 
     supabaseClient
         .channel("room-status-" + roomId)
@@ -520,8 +520,13 @@ const supabaseClient = window.supabase.createClient(
 
                 const room = payload.new;
 
+                console.log("Room updated:", room);
+
                 if (room.status === "playing") {
-                    showQuestion();
+
+                    hideAll();
+
+                    document.getElementById("game").classList.add("active");
                 }
             }
         )
