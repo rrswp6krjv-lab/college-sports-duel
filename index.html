@@ -403,27 +403,60 @@ const supabaseClient = window.supabase.createClient(
     document.getElementById("lobby").classList.add("active");
 }
 
-    function joinRoom() {
+  async function joinRoom() {
 
-        const name = document.getElementById("joinName").value.trim();
+    const name = document.getElementById("joinName").value.trim();
+    const code = document.getElementById("roomInput").value.trim().toUpperCase();
 
-        const code = document.getElementById("roomInput").value.trim();
-
-        if (!name || !code) {
-            alert("Enter your nickname and room code.");
-            return;
-        }
-
-        document.getElementById("roomCode").textContent =
-            code.toUpperCase();
-
-        document.getElementById("hostPlayer").textContent =
-            "👤 " + name;
-
-        hideAll();
-
-        document.getElementById("lobby").classList.add("active");
+    if (!name || !code) {
+        alert("Enter your nickname and room code.");
+        return;
     }
+
+    // Find the room
+    const { data: room, error: roomError } = await supabaseClient
+        .from("rooms")
+        .select("*")
+        .eq("code", code)
+        .single();
+
+    if (roomError || !room) {
+        console.error(roomError);
+        alert("Room not found. Check the room code.");
+        return;
+    }
+
+    // Add player to the room
+    const { data: player, error: playerError } = await supabaseClient
+        .from("players")
+        .insert({
+            room_id: room.id,
+            name: name,
+            score: 0,
+            is_host: false
+        })
+        .select()
+        .single();
+
+    if (playerError) {
+        console.error(playerError);
+        alert("Could not join the room.");
+        return;
+    }
+
+    // Show lobby
+    document.getElementById("roomCode").textContent = code;
+
+    document.getElementById("hostPlayer").textContent =
+        "🏆 " + room.host_name + " — Host";
+
+    hideAll();
+
+    document.getElementById("lobby").classList.add("active");
+
+    console.log("Joined room:", room.id);
+    console.log("Player:", player);
+}
 
     function startGame() {
 
