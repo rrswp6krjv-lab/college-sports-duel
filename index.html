@@ -456,8 +456,59 @@ const supabaseClient = window.supabase.createClient(
 
     console.log("Joined room:", room.id);
     console.log("Player:", player);
+
+    subscribeToPlayers(room.id);
 }
 
+    function subscribeToPlayers(roomId) {
+
+    supabaseClient
+        .channel("room-" + roomId)
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "players",
+                filter: "room_id=eq." + roomId
+            },
+            async () => {
+
+                const { data: players, error } = await supabaseClient
+                    .from("players")
+                    .select("*")
+                    .eq("room_id", roomId)
+                    .order("created_at", { ascending: true });
+
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+
+                displayPlayers(players);
+            }
+        )
+        .subscribe();
+}
+
+    function displayPlayers(players) {
+
+    const hostPlayer = document.getElementById("hostPlayer");
+
+    if (!hostPlayer) return;
+
+    hostPlayer.innerHTML = "";
+
+    players.forEach(player => {
+
+        const playerDiv = document.createElement("div");
+
+        playerDiv.textContent =
+            (player.is_host ? "🏆 " : "👤 ") + player.name;
+
+        hostPlayer.appendChild(playerDiv);
+    });
+}
     function startGame() {
 
         hideAll();
