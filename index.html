@@ -401,6 +401,9 @@ const supabaseClient = window.supabase.createClient(
     hideAll();
 
     document.getElementById("lobby").classList.add("active");
+
+    subscribeToPlayers(room.id);
+    loadPlayers(room.id);
 }
 
   async function joinRoom() {
