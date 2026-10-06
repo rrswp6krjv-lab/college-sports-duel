@@ -351,26 +351,57 @@ const supabaseClient = window.supabase.createClient(
         return code;
     }
 
-    function createRoom() {
+    async function createRoom() {
 
-        const name = document.getElementById("hostName").value.trim();
+    const name = document.getElementById("hostName").value.trim();
 
-        if (!name) {
-            alert("Enter a nickname first.");
-            return;
-        }
-
-        const code = generateRoomCode();
-
-        document.getElementById("roomCode").textContent = code;
-
-        document.getElementById("hostPlayer").textContent =
-            "🏆 " + name + " — Host";
-
-        hideAll();
-
-        document.getElementById("lobby").classList.add("active");
+    if (!name) {
+        alert("Enter a nickname first.");
+        return;
     }
+
+    const code = generateRoomCode();
+
+    const { data: room, error: roomError } = await supabaseClient
+        .from("rooms")
+        .insert({
+            code: code,
+            host_name: name,
+            status: "waiting"
+        })
+        .select()
+        .single();
+
+    if (roomError) {
+        console.error(roomError);
+        alert("Could not create room. Check your Supabase setup.");
+        return;
+    }
+
+    const { error: playerError } = await supabaseClient
+        .from("players")
+        .insert({
+            room_id: room.id,
+            name: name,
+            score: 0,
+            is_host: true
+        });
+
+    if (playerError) {
+        console.error(playerError);
+        alert("Room created, but player could not be added.");
+        return;
+    }
+
+    document.getElementById("roomCode").textContent = code;
+
+    document.getElementById("hostPlayer").textContent =
+        "🏆 " + name + " — Host";
+
+    hideAll();
+
+    document.getElementById("lobby").classList.add("active");
+}
 
     function joinRoom() {
 
