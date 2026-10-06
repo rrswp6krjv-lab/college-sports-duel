@@ -530,7 +530,9 @@ const supabaseClient = window.supabase.createClient(
                 }
             }
         )
-        .subscribe();
+        .subscribe((status) => {
+            console.log("Room realtime status:", status);
+        });
 }
 
     function displayPlayers(players) {
