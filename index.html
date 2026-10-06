@@ -1,9 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>College Sports Duel</title>
 
     <style>
@@ -26,23 +26,23 @@
 
         .container {
             width: 90%;
-            max-width: 700px;
+            max-width: 650px;
         }
 
         .trophy {
-            font-size: 70px;
+            font-size: 65px;
             margin-bottom: 15px;
         }
 
         h1 {
-            font-size: 48px;
+            font-size: 42px;
             margin-bottom: 8px;
         }
 
         .subtitle {
-            font-size: 20px;
-            color: #b8beca;
-            margin-bottom: 40px;
+            color: #aeb5c1;
+            font-size: 19px;
+            margin-bottom: 35px;
         }
 
         .buttons {
@@ -54,40 +54,85 @@
         }
 
         button {
-            padding: 18px;
-            border: none;
+            padding: 17px;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
         }
 
-        .create {
-            background: #ffffff;
+        .primary {
+            background: white;
             color: #080b12;
+            border: none;
         }
 
-        .join {
+        .secondary {
             background: transparent;
             color: white;
-            border: 2px solid #ffffff;
+            border: 2px solid white;
         }
 
         button:hover {
-            transform: scale(1.03);
+            transform: scale(1.02);
         }
 
-        .sports {
-            margin-top: 45px;
-            font-size: 18px;
-            color: #8f96a3;
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 17px;
+            text-align: center;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .back {
+            margin-top: 20px;
+            background: transparent;
+            border: none;
+            color: #aeb5c1;
+        }
+
+        .room-code {
+            font-size: 42px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin: 25px 0;
+        }
+
+        .player-list {
+            background: #111621;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .player {
+            padding: 10px;
+            border-bottom: 1px solid #252b36;
+        }
+
+        .player:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+<div class="container">
+
+    <!-- HOME -->
+    <div id="home" class="screen active">
 
         <div class="trophy">🏆</div>
 
@@ -99,33 +144,269 @@
 
         <div class="buttons">
 
-            <button class="create" onclick="createRoom()">
+            <button class="primary" onclick="showCreate()">
                 CREATE ROOM
             </button>
 
-            <button class="join" onclick="joinRoom()">
+            <button class="secondary" onclick="showJoin()">
                 JOIN ROOM
             </button>
 
         </div>
 
-        <div class="sports">
+        <p style="margin-top:40px; color:#7f8794;">
             🏈 College Football &nbsp;&nbsp; 🏀 March Madness
-        </div>
+        </p>
 
     </div>
 
-    <script>
 
-        function createRoom() {
-            alert("Room creation coming next!");
+    <!-- CREATE ROOM -->
+    <div id="create" class="screen">
+
+        <h1>Create Room</h1>
+
+        <p class="subtitle">
+            Enter your player name.
+        </p>
+
+        <input
+            id="hostName"
+            type="text"
+            placeholder="Your nickname"
+            maxlength="15"
+        >
+
+        <button class="primary" onclick="createRoom()">
+            CREATE DUEL
+        </button>
+
+        <br>
+
+        <button class="back" onclick="goHome()">
+            ← Back
+        </button>
+
+    </div>
+
+
+    <!-- JOIN ROOM -->
+    <div id="join" class="screen">
+
+        <h1>Join Room</h1>
+
+        <p class="subtitle">
+            Enter the room code and your nickname.
+        </p>
+
+        <input
+            id="joinName"
+            type="text"
+            placeholder="Your nickname"
+            maxlength="15"
+        >
+
+        <input
+            id="roomInput"
+            type="text"
+            placeholder="Room Code"
+            maxlength="6"
+        >
+
+        <button class="primary" onclick="joinRoom()">
+            JOIN DUEL
+        </button>
+
+        <br>
+
+        <button class="back" onclick="goHome()">
+            ← Back
+        </button>
+
+    </div>
+
+
+    <!-- LOBBY -->
+    <div id="lobby" class="screen">
+
+        <div class="trophy">🏆</div>
+
+        <h1>DUEL LOBBY</h1>
+
+        <p class="subtitle">
+            Share this code with your players.
+        </p>
+
+        <div class="room-code" id="roomCode">
+            ------ 
+        </div>
+
+        <div class="player-list">
+
+            <h2>Players</h2>
+
+            <div class="player" id="hostPlayer">
+                Player
+            </div>
+
+        </div>
+
+        <button
+            class="primary"
+            style="margin-top:25px;"
+            onclick="startGame()"
+        >
+            START DUEL
+        </button>
+
+    </div>
+
+
+    <!-- GAME -->
+    <div id="game" class="screen">
+
+        <p style="color:#aeb5c1;">
+            COLLEGE SPORTS DUEL
+        </p>
+
+        <h1 id="questionTitle">
+            🏈 Football Trivia
+        </h1>
+
+        <p id="question">
+            Which team won the most recent College Football Playoff championship?
+        </p>
+
+        <div class="buttons" style="margin-top:30px;">
+
+            <button class="secondary" onclick="answer('A')">
+                A
+            </button>
+
+            <button class="secondary" onclick="answer('B')">
+                B
+            </button>
+
+            <button class="secondary" onclick="answer('C')">
+                C
+            </button>
+
+            <button class="secondary" onclick="answer('D')">
+                D
+            </button>
+
+        </div>
+
+        <p id="result" style="margin-top:30px;"></p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function hideAll() {
+        document.querySelectorAll(".screen").forEach(screen => {
+            screen.classList.remove("active");
+        });
+    }
+
+    function showCreate() {
+        hideAll();
+        document.getElementById("create").classList.add("active");
+    }
+
+    function showJoin() {
+        hideAll();
+        document.getElementById("join").classList.add("active");
+    }
+
+    function goHome() {
+        hideAll();
+        document.getElementById("home").classList.add("active");
+    }
+
+    function generateRoomCode() {
+
+        const characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+        let code = "";
+
+        for (let i = 0; i < 6; i++) {
+            code += characters.charAt(
+                Math.floor(Math.random() * characters.length)
+            );
         }
 
-        function joinRoom() {
-            alert("Room joining coming next!");
+        return code;
+    }
+
+    function createRoom() {
+
+        const name = document.getElementById("hostName").value.trim();
+
+        if (!name) {
+            alert("Enter a nickname first.");
+            return;
         }
 
-    </script>
+        const code = generateRoomCode();
+
+        document.getElementById("roomCode").textContent = code;
+
+        document.getElementById("hostPlayer").textContent =
+            "🏆 " + name + " — Host";
+
+        hideAll();
+
+        document.getElementById("lobby").classList.add("active");
+    }
+
+    function joinRoom() {
+
+        const name = document.getElementById("joinName").value.trim();
+
+        const code = document.getElementById("roomInput").value.trim();
+
+        if (!name || !code) {
+            alert("Enter your nickname and room code.");
+            return;
+        }
+
+        document.getElementById("roomCode").textContent =
+            code.toUpperCase();
+
+        document.getElementById("hostPlayer").textContent =
+            "👤 " + name;
+
+        hideAll();
+
+        document.getElementById("lobby").classList.add("active");
+    }
+
+    function startGame() {
+
+        hideAll();
+
+        document.getElementById("game").classList.add("active");
+    }
+
+    function answer(choice) {
+
+        const result = document.getElementById("result");
+
+        if (choice === "A") {
+            result.textContent =
+                "✅ Correct! +100 points";
+        } else {
+            result.textContent =
+                "❌ Incorrect. Keep going!";
+        }
+    }
+
+</script>
 
 </body>
 </html>
+```
