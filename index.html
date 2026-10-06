@@ -307,6 +307,8 @@
     
 <script>
 
+let currentRoomId = null;
+    
 const SUPABASE_URL = "https://qfuxmexhjsvujozhnkgn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_1v0-cQ9DXmqHC2NIgmHu6A_b8EMaki1";
 
@@ -378,6 +380,9 @@ const supabaseClient = window.supabase.createClient(
         return;
     }
 
+
+    currentRoomId = room.id;
+        
     const { error: playerError } = await supabaseClient
         .from("players")
         .insert({
@@ -430,6 +435,8 @@ const supabaseClient = window.supabase.createClient(
         return;
     }
 
+    currentRoomId = room.id;
+      
     // Add player to the room
     const { data: player, error: playerError } = await supabaseClient
         .from("players")
@@ -555,25 +562,43 @@ const supabaseClient = window.supabase.createClient(
 
     displayPlayers(players);
 }
-    function startGame() {
+ async function startGame() {
 
-        hideAll();
-
-        document.getElementById("game").classList.add("active");
+    if (!currentRoomId) {
+        alert("Room information is missing.");
+        return;
     }
 
-    function answer(choice) {
+    const { error } = await supabaseClient
+        .from("rooms")
+        .update({
+            status: "playing"
+        })
+        .eq("id", currentRoomId);
 
-        const result = document.getElementById("result");
-
-        if (choice === "A") {
-            result.textContent =
-                "✅ Correct! +100 points";
-        } else {
-            result.textContent =
-                "❌ Incorrect. Keep going!";
-        }
+    if (error) {
+        console.error(error);
+        alert("Could not start the duel.");
+        return;
     }
+
+    hideAll();
+
+    document.getElementById("game").classList.add("active");
+}
+
+function answer(choice) {
+
+    const result = document.getElementById("result");
+
+    if (choice === "A") {
+        result.textContent =
+            "✅ Correct! +100 points";
+    } else {
+        result.textContent =
+            "❌ Incorrect. Keep going!";
+    }
+}
 
 </script>
 
