@@ -458,6 +458,7 @@ const supabaseClient = window.supabase.createClient(
     console.log("Player:", player);
 
     subscribeToPlayers(room.id);
+    loadPlayers(room.id);
 }
 
     function subscribeToPlayers(roomId) {
@@ -508,6 +509,22 @@ const supabaseClient = window.supabase.createClient(
 
         hostPlayer.appendChild(playerDiv);
     });
+}
+
+    async function loadPlayers(roomId) {
+
+    const { data: players, error } = await supabaseClient
+        .from("players")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        console.error("Could not load players:", error);
+        return;
+    }
+
+    displayPlayers(players);
 }
     function startGame() {
 
