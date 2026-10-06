@@ -527,10 +527,9 @@ const supabaseClient = window.supabase.createClient(
                 console.log("Room updated:", room);
 
                 if (room.status === "playing") {
-
                     hideAll();
-
                     document.getElementById("game").classList.add("active");
+                    startTimer();
                 }
             }
         )
@@ -597,7 +596,6 @@ const supabaseClient = window.supabase.createClient(
 
     document.getElementById("game").classList.add("active");
 
-    startTimer();
 }
 
 let timerInterval;
