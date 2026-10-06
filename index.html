@@ -297,6 +297,10 @@
 
         </div>
 
+        <p id="timer" style="font-size:24px; font-weight:bold; margin-top:20px;">
+             15
+        </p>
+        
         <p id="result" style="margin-top:30px;"></p>
 
     </div>
@@ -592,8 +596,39 @@ const supabaseClient = window.supabase.createClient(
     hideAll();
 
     document.getElementById("game").classList.add("active");
+
+    startTimer();
 }
 
+let timerInterval;
+
+function startTimer() {
+
+    let timeLeft = 15;
+
+    const timer = document.getElementById("timer");
+
+    timer.textContent = timeLeft;
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+
+        timeLeft--;
+
+        timer.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timerInterval);
+
+            timer.textContent = "Time's up!";
+
+        }
+
+    }, 1000);
+}
+    
 function answer(choice) {
 
     const result = document.getElementById("result");
