@@ -312,6 +312,7 @@
 <script>
 
 let currentRoomId = null;
+let currentPlayerId = null;
     
 const SUPABASE_URL = "https://qfuxmexhjsvujozhnkgn.supabase.co";
 const SUPABASE_KEY = "sb_publishable_1v0-cQ9DXmqHC2NIgmHu6A_b8EMaki1";
@@ -387,14 +388,24 @@ const supabaseClient = window.supabase.createClient(
 
     currentRoomId = room.id;
         
-    const { error: playerError } = await supabaseClient
-        .from("players")
-        .insert({
-            room_id: room.id,
-            name: name,
-            score: 0,
-            is_host: true
-        });
+    const { data: player, error: playerError } = await supabaseClient
+    .from("players")
+    .insert({
+        room_id: room.id,
+        name: name,
+        score: 0,
+        is_host: true
+    })
+    .select()
+    .single();
+
+if (playerError) {
+    console.error(playerError);
+    alert("Room created, but player could not be added.");
+    return;
+}
+
+currentPlayerId = player.id;
 
     if (playerError) {
         console.error(playerError);
@@ -458,6 +469,8 @@ const supabaseClient = window.supabase.createClient(
         alert("Could not join the room.");
         return;
     }
+
+    currentPlayerId = player.id;
 
     // Show lobby
     document.getElementById("roomCode").textContent = code;
@@ -599,8 +612,15 @@ const supabaseClient = window.supabase.createClient(
 }
 
 let timerInterval;
-
+let answered = false;
+    
 function startTimer() {
+
+    answered = false;
+
+    document.querySelectorAll(".buttons button").forEach(button => {
+        button.disabled = false;
+    });
 
     let timeLeft = 15;
 
@@ -620,18 +640,50 @@ function startTimer() {
 
             clearInterval(timerInterval);
 
+            answered = true;
+
             timer.textContent = "Time's up!";
 
-        }
+            document.getElementById("result").textContent =
+                "⏰ Time's up!";
+
+            document.querySelectorAll(".buttons button").forEach(button => {
+                button.disabled = true;
+            });
+
+}
 
     }, 1000);
 }
     
-function answer(choice) {
+async function answer(choice) {
+
+    if (answered) {
+        return;
+    }
+
+    answered = true;
 
     const result = document.getElementById("result");
 
-    if (choice === "A") {
+    const isCorrect = choice === "A";
+    const points = isCorrect ? 100 : 0;
+
+    const { error } = await supabaseClient
+        .from("answers")
+        .insert({
+            room_id: currentRoomId,
+            player_id: currentPlayerId,
+            answer: choice,
+            correct: isCorrect,
+            points: points
+        });
+
+    if (error) {
+        console.error("Could not save answer:", error);
+    }
+
+    if (isCorrect) {
         result.textContent =
             "✅ Correct! +100 points";
     } else {
