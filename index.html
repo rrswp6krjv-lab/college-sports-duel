@@ -656,6 +656,7 @@ function startTimer() {
     }, 1000);
 }
     
+
 async function answer(choice) {
 
     if (answered) {
@@ -679,37 +680,38 @@ async function answer(choice) {
             points: points
         });
 
-    
-if (error) {
-    console.error("Could not save answer:", error);
-    alert("Your answer could not be saved.");
-    return;
-}
-
-if (isCorrect) {
-
-    const { data: player, error: playerError } = await supabaseClient
-        .from("players")
-        .select("score")
-        .eq("id", currentPlayerId)
-        .single();
-
-    if (playerError) {
-        console.error("Could not load player score:", playerError);
+    if (error) {
+        console.error("Could not save answer:", error);
+        alert("Your answer could not be saved.");
         return;
     }
 
-    const { error: scoreError } = await supabaseClient
-        .from("players")
-        .update({
-            score: player.score + points
-        })
-        .eq("id", currentPlayerId);
+    if (isCorrect) {
 
-    if (scoreError) {
-        console.error("Could not update score:", scoreError);
-        return;
+        const { data: player, error: playerError } = await supabaseClient
+            .from("players")
+            .select("score")
+            .eq("id", currentPlayerId)
+            .single();
+
+        if (playerError) {
+            console.error("Could not load player score:", playerError);
+            return;
+        }
+
+        const { error: scoreError } = await supabaseClient
+            .from("players")
+            .update({
+                score: player.score + points
+            })
+            .eq("id", currentPlayerId);
+
+        if (scoreError) {
+            console.error("Could not update score:", scoreError);
+            return;
+        }
     }
+
     result.textContent = "✅ Answer locked in!";
 }
 </script>
