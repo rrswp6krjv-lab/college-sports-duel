@@ -638,18 +638,18 @@ function startTimer() {
 
         if (timeLeft <= 0) {
 
-            clearInterval(timerInterval);
+    clearInterval(timerInterval);
 
-            answered = true;
+    answered = true;
 
-            timer.textContent = "Time's up!";
+    timer.textContent = "Time's up!";
 
-            document.getElementById("result").textContent =
-                "⏰ Time's up!";
+    document.getElementById("result").textContent =
+        "⏰ Time's up! The correct answer was A!";
 
-            document.querySelectorAll(".buttons button").forEach(button => {
-                button.disabled = true;
-            });
+    document.querySelectorAll(".buttons button").forEach(button => {
+        button.disabled = true;
+    });
 
 }
 
@@ -683,14 +683,7 @@ async function answer(choice) {
         console.error("Could not save answer:", error);
     }
 
-    if (isCorrect) {
-        result.textContent =
-            "✅ Correct! +100 points";
-    } else {
-        result.textContent =
-            "❌ Incorrect. Keep going!";
-    }
-}
+    result.textContent = "✅ Answer locked in!";
 
 </script>
 
